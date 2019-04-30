@@ -40,7 +40,6 @@
 # Get-GlobalAddressList | WHERE { $_.RecipientFilterType -eq 'Legacy' } | foreach { Set-GlobalAddressList $_.Name -RecipientFilter (.\ConvertFrom-LdapFilter $_.LdapRecipientFilter) -ForceUpgrade } 
 # Get-EmailAddressPolicy | WHERE { $_.RecipientFilterType -eq 'Legacy' } | foreach { Set-EmailAddressPolicy $_.Name -RecipientFilter (.\ConvertFrom-LdapFilter $_.LdapRecipientFilter) -ForceUpgrade } 
 #  
- 
 trap { 
     write-host $_.Exception.Message -fore Red 
     continue 
