@@ -17,7 +17,7 @@ Describe -Name 'Domain Controller Infrastructure Test' {
     if ($Domains -eq $null) { return }
     foreach ($Domain in $Domains) {
         try {
-            $DomainControllers = (Get-ADDomainController -Server $Domain -Filter * -ErrorAction Stop | Select HostName).HostName
+            $DomainControllers = (Get-ADDomainController -Server $Domain -Filter * -ErrorAction Stop | Select-Object HostName).HostName
         }
         catch {
             $DomainControllers = $null
