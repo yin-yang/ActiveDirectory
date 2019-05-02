@@ -7,7 +7,7 @@ param (
 )
 
 begin {
-    function Check-Service {
+    function Test-Service {
         param (
     
             [Parameter(ParameterSetName = 'Servicios')]
@@ -19,7 +19,7 @@ begin {
             [String]
             $Test,
             
-            $timeout = 60,
+            $timeout = 120,
     
             [String]
             $DC,
@@ -112,7 +112,8 @@ process {
     try {
         Import-Module ActiveDirectory -Verbose:$false -ErrorAction Stop
         $getForest = (Get-ADForest)
-        $DCServers = (Get-ADForest).Domains | ForEach-Object { Get-ADDomainController -Filter * -Server $_ } | Select-Object -ExpandProperty Name
+        $DCServers = (Get-ADForest).Domains | ForEach-Object { Get-ADDomainController -Filter * -Server $_ } | Select-Object -Expand HostName
+
     }
     catch {
         try {
@@ -122,12 +123,13 @@ process {
         catch {
             Write-Error $_
             break
-        }
+        } # try catch
 
-    }
+    } # try catch
 
-    $timeout = 60
+    $timeout = 120
         
+    # If file already exist, it will clear it 
     $report = $DestinationPath
     Clear-Content $report 
         
@@ -210,13 +212,13 @@ process {
 			
             # Checking services
             Foreach ($S in $Services) {
-                Check-Service -Service $S -DC $DC -report $report
+                Test-Service -Service $S -DC $DC -report $report
                 
             } # foreach services
             
             # Executing tests
             Foreach ($T in $Test) {
-                Check-Service -Test $T -DC $DC -Report $report
+                Test-Service -Test $T -DC $DC -Report $report
             } # foreach tests
             
         } 
@@ -232,9 +234,17 @@ process {
                         
     } # Foreach
                 
-    $CloseTags = @"
+    $TableTags = @"
     </tr>
     </table>
+"@
+    Add-Content $report $TableTags
+
+    $Repadmin = repadmin /replsummary * /bysrc /bydest
+    $OutRepadmin = $Repadmin | ForEach-Object { "<pre>" + $_ + "</pre>" } 
+
+    $CloseTags = @"
+    $OutRepadmin
     </body>
     </html>
 "@
