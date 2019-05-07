@@ -204,7 +204,7 @@ process {
     foreach ($DC in $DCServers) {
         $Identity = $DC
         Add-Content $report "<tr>"
-        if ( Test-Connection -ComputerName $DC -Count 1 -ErrorAction SilentlyContinue ) {
+        if ( Get-Service -ComputerName $DC  -ErrorAction SilentlyContinue ) {
             Write-Verbose "[PROCESS] $DC `t PING SUCCESS"
             
             Add-Content $report "<td bgcolor= 'GainsBoro' align=center>  <B> $Identity</B></td>" 
